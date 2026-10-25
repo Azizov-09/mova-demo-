@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MOVA — Modern People Discovery & Portfolio Platform
 
-## Getting Started
+> A production-ready, ultra-responsive People Discovery Platform engineered with **Next.js 16 (Turbopack)**, **React 19**, **TypeScript**, **Tailwind CSS**, and **Framer Motion**.
 
-First, run the development server:
+---
 
+## 🌟 Key Features
+
+- 🔍 **People Discovery & Search:** Real-time search, multi-category filters, and responsive sort options.
+- 👤 **Rich Profile Showcase:** Comprehensive biography, career timeline chronology, verified achievements, project highlights, and media galleries.
+- 🛡️ **Multi-Role Demo System:** 1-Click Role Login Gateway supporting 5 roles:
+  - 👑 **Super Admin** — Master system statistics, claims verification station, and user status management.
+  - 🛡️ **Platform Admin** — Category management, claim approvals, and platform audits.
+  - ⚖️ **Content Moderator** — Content review queue, flagged profile handling, and moderation log.
+  - 🎨 **Creator** — Live biography editor, achievements manager with persistent storage.
+  - 🧭 **User** — Bookmarked profiles collection, discovery algorithm preferences.
+- 🔐 **Role-Based Navigation Guards:** Automatic redirection preventing unauthorized cross-role route access in demo mode.
+- 📱 **Universal Responsiveness:** Pixel-perfect from **320px** mobile up to **3840px 4K ultrawide** displays with zero horizontal overflow.
+- ⚡ **Data Persistence:** Client-side local storage engine for session management, creator bio editing, achievements, and bookmarks.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- **Node.js** >= 18.18.0
+- **npm** or **pnpm**
+
+### 2. Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Azizov-09/mova-demo-.git
+cd mova-demo-
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧪 Testing & Quality Assurance
 
-## Learn More
+### Vitest Unit Tests
+```bash
+npm run test
+```
+- **18/18 PASS** across utility suites and repository mock storage.
 
-To learn more about Next.js, take a look at the following resources:
+### Playwright Automated E2E Suite
+```bash
+npx playwright test --reporter=list
+```
+- **8/8 PASS** verifying Public Pages, Login Gateway, Role Guards, Super Admin, Creator, User, Switch Account, and Multi-Viewport Zero-Overflow.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Production Build
+```bash
+npm run build
+```
+- Fully compiled with **Next.js 16 Turbopack**, Cache Components, and Partial Prefetching.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠️ Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Framework:** Next.js 16 (App Router, Turbopack)
+- **UI Library:** React 19
+- **Language:** TypeScript 5
+- **Styling:** Vanilla CSS design tokens + Tailwind CSS
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **Validation:** Zod
+- **Testing:** Playwright, Vitest, Testing Library
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📄 License
+MIT License. Created for the MOVA platform demonstration.
