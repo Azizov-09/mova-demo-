@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -10,7 +10,6 @@ import {
   X,
   Sun,
   Moon,
-  ChevronDown,
   Compass,
   Users,
   Info,
@@ -26,6 +25,7 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -42,7 +42,10 @@ export function Navbar() {
   // Load theme
   useEffect(() => {
     const stored = localStorage.getItem('mova-theme') as 'dark' | 'light' | null;
-    if (stored) setTheme(stored);
+    if (!stored) return;
+
+    const frame = window.requestAnimationFrame(() => setTheme(stored));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   // Prevent body scroll when mobile menu open
@@ -77,12 +80,6 @@ export function Navbar() {
     }
   }, [isSearchOpen]);
 
-  // Close mobile on route change
-  useEffect(() => {
-    setIsMobileOpen(false);
-    setIsSearchOpen(false);
-  }, [pathname]);
-
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
@@ -102,7 +99,7 @@ export function Navbar() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isScrolled
-            ? 'bg-[var(--bg-overlay)] backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-[var(--shadow-sm)]'
+            ? 'bg-[var(--bg-overlay)] backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-[var(--mova-shadow-sm)]'
             : 'bg-transparent'
         )}
         style={{ height: 'var(--nav-height)' }}
@@ -328,10 +325,18 @@ export function Navbar() {
 
               {/* Mobile Bottom */}
               <div className="p-5 border-t border-[var(--border-subtle)] space-y-3">
-                <Link href="/login" className="btn btn-primary w-full">
+                <Link
+                  href="/login"
+                  className="btn btn-primary w-full"
+                  onClick={() => setIsMobileOpen(false)}
+                >
                   Sign In
                 </Link>
-                <Link href="/claim" className="btn btn-secondary w-full">
+                <Link
+                  href="/claim"
+                  className="btn btn-secondary w-full"
+                  onClick={() => setIsMobileOpen(false)}
+                >
                   Claim Profile
                 </Link>
               </div>
@@ -363,7 +368,7 @@ export function Navbar() {
               aria-label="Search"
               aria-modal="true"
             >
-              <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-2xl overflow-hidden shadow-[var(--shadow-xl)]">
+              <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-2xl overflow-hidden shadow-[var(--mova-shadow-lg)]">
                 {/* Search Input */}
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border-subtle)]">
                   <Search size={18} style={{ color: 'var(--text-tertiary)' }} />
@@ -376,7 +381,8 @@ export function Navbar() {
                       if (e.key === 'Enter') {
                         const val = e.currentTarget.value.trim();
                         if (val) {
-                          window.location.href = `/explore?q=${encodeURIComponent(val)}`;
+                          setIsSearchOpen(false);
+                          router.push(`/explore?q=${encodeURIComponent(val)}`);
                         }
                       }
                       if (e.key === 'Escape') setIsSearchOpen(false);

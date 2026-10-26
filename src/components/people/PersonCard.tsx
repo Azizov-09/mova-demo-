@@ -109,7 +109,7 @@ export function PersonCard({
     >
       <Link
         href={`/people/${person.slug}`}
-        className="block rounded-2xl border border-[var(--border-subtle)] overflow-hidden bg-[var(--bg-card)] transition-all duration-300 hover:border-[var(--border-default)] hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+        className="block rounded-2xl border border-[var(--border-subtle)] overflow-hidden bg-[var(--bg-card)] transition-all duration-300 hover:border-[var(--border-default)] hover:shadow-[var(--mova-shadow-lg)] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
         style={{ display: 'block' }}
         aria-label={`View ${person.fullName}'s profile`}
       >
@@ -128,7 +128,7 @@ export function PersonCard({
                 className="object-cover"
                 onError={() => setImgError(true)}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                loading="lazy"
+                loading={index < 3 ? 'eager' : 'lazy'}
               />
             </motion.div>
           ) : (

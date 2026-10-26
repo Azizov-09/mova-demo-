@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -10,14 +10,12 @@ import {
   Search,
   ArrowRight,
   ArrowLeft,
-  FileText,
   User,
   Mail,
   Briefcase,
   Link2,
   Copy,
   Check,
-  Sparkles,
 } from 'lucide-react';
 import { mockPeople } from '@/data/mock/people';
 import { claimsRepository } from '@/data/repositories/mock';
@@ -109,7 +107,7 @@ export default function ClaimProfileClient() {
   return (
     <div
       className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center"
-      style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-sans)' }}
+      style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-body)' }}
     >
       <div className="max-w-3xl mx-auto w-full">
         {/* Header */}

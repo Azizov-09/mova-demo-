@@ -6,37 +6,43 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
   FolderOpen,
-  FileText,
   CheckSquare,
   Image as ImageIcon,
-  BarChart3,
   Search,
   Plus,
   CheckCircle2,
-  AlertCircle,
-  ExternalLink,
   Edit,
-  Trash2,
   Check,
-  XCircle,
   Download,
-  Tag,
   Eye,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { mockPeople, mockCategories } from '@/data/mock/people';
+import type { PersonCategory } from '@/types';
 
 interface AdminViewProps {
   initialTab?: string;
 }
 
+const ADMIN_TAB_ALIASES: Record<string, string> = {
+  media: 'content',
+  settings: 'overview',
+};
+
+const ADMIN_TABS = new Set(['overview', 'profiles', 'categories', 'content', 'claims', 'reports']);
+
+function resolveAdminTab(tab: string) {
+  const resolved = ADMIN_TAB_ALIASES[tab] ?? tab;
+  return ADMIN_TABS.has(resolved) ? resolved : 'overview';
+}
+
 export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => resolveAdminTab(initialTab));
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [categoriesList, setCategoriesList] = useState(mockCategories);
+  const [categoriesList] = useState(mockCategories);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<PersonCategory | 'ALL'>('ALL');
 
   const [featuredProfiles, setFeaturedProfiles] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {};
@@ -63,7 +69,7 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
     const matchesSearch =
       p.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.professionalTitle.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = selectedCategory === 'ALL' || p.categories.includes(selectedCategory as any);
+    const matchesCat = selectedCategory === 'ALL' || p.categories.includes(selectedCategory);
     return matchesSearch && matchesCat;
   });
 
@@ -124,7 +130,7 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div
             className="p-5 rounded-2xl"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -191,7 +197,7 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[var(--border-subtle)]">
+        <div className="dashboard-tabs">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'profiles', label: 'People Directory' },
@@ -215,7 +221,7 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
         </div>
 
         {/* Tab: Overview or Profiles */}
-        {(activeTab === 'overview' || activeTab === 'profiles') && (
+        {(activeTab === 'overview' || activeTab === 'profiles' || activeTab === 'content') && (
           <div
             className="p-5 rounded-2xl space-y-4"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -235,7 +241,9 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
 
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) =>
+                    setSelectedCategory(e.target.value as PersonCategory | 'ALL')
+                  }
                   className="px-3 py-2 rounded-xl text-xs bg-[var(--bg-base)] border border-[var(--border-default)] text-[var(--text-secondary)]"
                 >
                   <option value="ALL">All Categories</option>
@@ -252,7 +260,13 @@ export function AdminView({ initialTab = 'overview' }: AdminViewProps) {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div
+              className="table-scroll"
+              tabIndex={0}
+              role="region"
+              aria-label="People directory table; scroll horizontally for spotlight and actions"
+              data-responsive-table
+            >
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-[var(--border-subtle)] text-[var(--text-tertiary)]">

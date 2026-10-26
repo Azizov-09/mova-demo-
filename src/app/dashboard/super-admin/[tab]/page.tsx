@@ -7,7 +7,7 @@ async function SuperAdminSubContent({
   params: Promise<{ tab: string }>;
 }) {
   const { tab } = await params;
-  return <SuperAdminView initialTab={tab} />;
+  return <SuperAdminView key={tab} initialTab={tab} />;
 }
 
 export default function SuperAdminSubPage({

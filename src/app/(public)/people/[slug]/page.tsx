@@ -30,7 +30,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function PersonPage({
+async function PersonContent({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -42,6 +42,14 @@ export default async function PersonPage({
     notFound();
   }
 
+  return <PersonDetailClient person={person} />;
+}
+
+export default function PersonPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   return (
     <Suspense
       fallback={
@@ -50,7 +58,7 @@ export default async function PersonPage({
         </div>
       }
     >
-      <PersonDetailClient person={person} />
+      <PersonContent params={params} />
     </Suspense>
   );
 }

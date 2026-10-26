@@ -7,7 +7,7 @@ async function AdminSubContent({
   params: Promise<{ tab: string }>;
 }) {
   const { tab } = await params;
-  return <AdminView initialTab={tab} />;
+  return <AdminView key={tab} initialTab={tab} />;
 }
 
 export default function AdminSubPage({

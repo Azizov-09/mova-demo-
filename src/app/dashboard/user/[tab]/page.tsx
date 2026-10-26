@@ -7,7 +7,7 @@ async function UserSubContent({
   params: Promise<{ tab: string }>;
 }) {
   const { tab } = await params;
-  return <UserView initialTab={tab} />;
+  return <UserView key={tab} initialTab={tab} />;
 }
 
 export default function UserSubPage({

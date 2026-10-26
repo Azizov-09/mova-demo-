@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Compass, Shield, Sparkles, Eye, Users, Globe2, HeartHandshake } from 'lucide-react';
+import { ArrowRight, Compass, Shield, Sparkles, Globe2, HeartHandshake } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About MOVA — Discover People. Explore Their Stories.',
@@ -40,6 +40,7 @@ export default function AboutPage() {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-base)] via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[var(--bg-elevated)]/85 backdrop-blur-md border border-[var(--border-subtle)]">

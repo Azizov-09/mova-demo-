@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Compass, Users, Sparkles, Filter } from 'lucide-react';
+import { ArrowRight, Compass, Sparkles } from 'lucide-react';
 import { mockCategories, mockPeople } from '@/data/mock/people';
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function CategoriesPage() {
       {/* Categories Grid */}
       <section className="container-mova">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockCategories.map((category, index) => {
+          {mockCategories.map((category) => {
             const peopleInCategory = mockPeople.filter(p => p.categories.includes(category.id));
             const count = peopleInCategory.length;
 

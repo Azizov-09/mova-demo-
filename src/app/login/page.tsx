@@ -18,7 +18,6 @@ import {
   ChevronRight,
   Sparkles,
   AlertCircle,
-  CheckCircle2,
   X,
 } from 'lucide-react';
 import { startDemoSession, DEMO_ROLE_METADATA } from '@/lib/demo/session';
@@ -42,11 +41,13 @@ function DemoRoleCard({
   onEnter,
   isLoading,
   loadingRole,
+  index,
 }: {
   meta: RoleMetadata;
   onEnter: (role: DemoRole) => void;
   isLoading: boolean;
   loadingRole: DemoRole | null;
+  index: number;
 }) {
   const Icon = ROLE_ICONS[meta.icon] ?? User;
   const isThisLoading = loadingRole === meta.role;
@@ -56,11 +57,11 @@ function DemoRoleCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
-      transition={{ duration: 0.25 }}
-      className="relative group"
+      transition={{ duration: 0.32, delay: 0.08 + index * 0.055 }}
+      className="relative group h-full min-w-0"
     >
       <div
-        className="relative p-5 rounded-2xl border transition-all duration-200 overflow-hidden"
+        className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border p-5 transition-all duration-200 sm:p-6"
         style={{
           background: meta.bgColor,
           borderColor: isThisLoading
@@ -76,7 +77,7 @@ function DemoRoleCard({
           }}
         />
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex h-full min-w-0 flex-col">
           {/* Icon + label row */}
           <div className="flex items-start justify-between mb-3">
             <div
@@ -97,27 +98,30 @@ function DemoRoleCard({
           </div>
 
           <h3
-            className="font-bold text-base mb-0.5 leading-tight"
+            className="mb-1 text-lg font-bold leading-tight"
             style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}
           >
             {meta.label}
           </h3>
-          <p className="text-xs font-semibold mb-2" style={{ color: meta.color }}>
+          <p className="mb-3 text-sm font-semibold leading-snug" style={{ color: meta.color }}>
             {meta.user.name} &bull; {meta.user.title}
           </p>
-          <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mb-5 flex-1 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             {meta.description}
           </p>
 
           {/* Demo account label */}
-          <p className="text-[11px] mb-3" style={{ color: 'var(--text-tertiary)' }}>
-            Demo account: <span style={{ color: meta.color }}>{meta.user.email}</span>
+          <p className="mb-4 text-xs leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+            Demo account:{' '}
+            <span className="font-medium break-all" style={{ color: meta.color }}>
+              {meta.user.email}
+            </span>
           </p>
 
           <button
             onClick={() => onEnter(meta.role)}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            className="mt-auto flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-semibold leading-snug transition-all duration-200"
             style={{
               background: isThisLoading ? meta.color : `${meta.color}18`,
               color: isThisLoading ? '#0B0D12' : meta.color,
@@ -157,7 +161,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   // Demo session state
   const [demoLoading, setDemoLoading] = useState(false);
@@ -201,7 +204,7 @@ export default function LoginPage() {
     >
       {/* Ambient background */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] pointer-events-none"
+        className="absolute top-0 left-1/2 h-[500px] w-[min(900px,100vw)] -translate-x-1/2 pointer-events-none"
         style={{
           background:
             'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(199,255,97,0.06) 0%, transparent 70%)',
@@ -216,7 +219,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Top bar */}
-        <div className="flex items-center justify-between p-6 max-w-7xl mx-auto w-full">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6">
           <Link href="/" className="flex items-center gap-2 group" aria-label="MOVA Home">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg"
@@ -241,20 +244,21 @@ export default function LoginPage() {
             className="text-sm flex items-center gap-1.5 transition-colors duration-150"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Browse without signing in
+            <span className="hidden sm:inline">Browse without signing in</span>
+            <span className="sm:hidden">Explore</span>
             <ArrowRight size={14} />
           </Link>
         </div>
 
         {/* Main content */}
-        <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="w-full max-w-5xl">
+        <div className="flex-1 px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10">
+          <div className="mx-auto w-full max-w-6xl">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-10"
+              className="mb-7 text-center sm:mb-8"
             >
               <div
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5"
@@ -281,7 +285,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="flex items-center justify-center gap-1 mb-8"
+              className="mb-6 flex items-center justify-center gap-1"
             >
               <div
                 className="flex p-1 rounded-2xl"
@@ -294,13 +298,20 @@ export default function LoginPage() {
                     role="tab"
                     aria-selected={activeTab === tab}
                     onClick={() => setActiveTab(tab)}
-                    className="relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                    className="relative flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 sm:px-6"
                     style={{
                       color: activeTab === tab ? (tab === 'demo' ? '#0B0D12' : 'var(--text-primary)') : 'var(--text-secondary)',
                       background: activeTab === tab ? (tab === 'demo' ? 'var(--accent-primary)' : 'var(--bg-card)') : 'transparent',
                     }}
                   >
-                    {tab === 'demo' ? '✦ Explore Demo Accounts' : 'Sign In'}
+                    {tab === 'demo' ? (
+                      <>
+                        <Sparkles size={14} aria-hidden />
+                        Explore Demo Accounts
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
                   </button>
                 ))}
               </div>
@@ -317,7 +328,7 @@ export default function LoginPage() {
                 >
                   {/* Demo banner */}
                   <div
-                    className="flex items-start gap-3 p-4 rounded-2xl mb-6 max-w-3xl mx-auto"
+                    className="mx-auto mb-7 flex max-w-4xl items-start gap-3 rounded-2xl p-4 sm:px-5"
                     style={{
                       background: 'rgba(199,255,97,0.05)',
                       border: '1px solid rgba(199,255,97,0.15)',
@@ -332,25 +343,24 @@ export default function LoginPage() {
                   </div>
 
                   {/* Role cards grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-5xl mx-auto">
+                  <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6 xl:gap-5">
                     {DEMO_ROLE_METADATA.map((meta, i) => (
-                      <motion.div
+                      <div
                         key={meta.role}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, delay: i * 0.07 }}
+                        className={`min-w-0 xl:col-span-2 ${i === 3 ? 'xl:col-start-2' : ''}`}
                       >
                         <DemoRoleCard
                           meta={meta}
                           onEnter={handleDemoEnter}
                           isLoading={demoLoading}
                           loadingRole={demoLoadingRole}
+                          index={i}
                         />
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
 
-                  <p className="text-center text-xs mt-8" style={{ color: 'var(--text-tertiary)' }}>
+                  <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
                     Demo sessions persist across browser refreshes but are never treated as real authentication.
                     Future FastAPI backend integration will replace this demo layer.
                   </p>
@@ -452,14 +462,6 @@ export default function LoginPage() {
                         </div>
                       )}
 
-                      {loginSuccess && (
-                        <div className="p-3 rounded-xl flex items-center gap-2 text-xs text-green-400"
-                          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }}>
-                          <CheckCircle2 size={14} />
-                          Signed in! Redirecting...
-                        </div>
-                      )}
-
                       <div>
                         <label
                           htmlFor="login-email"
@@ -540,7 +542,7 @@ export default function LoginPage() {
 
                       <button
                         type="submit"
-                        disabled={loginLoading || loginSuccess}
+                        disabled={loginLoading}
                         className="btn btn-primary w-full py-3 text-sm font-semibold mt-2"
                       >
                         {loginLoading ? (

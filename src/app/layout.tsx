@@ -1,5 +1,25 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono, Syne } from 'next/font/google';
+import { MotionProvider } from '@/components/MotionProvider';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -88,10 +108,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${syne.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <body suppressHydrationWarning>
         <ThemeScript />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

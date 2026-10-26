@@ -7,19 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
   MapPin,
-  Calendar,
   Sparkles,
   Share2,
   Bookmark,
   ExternalLink,
   Award,
-  Briefcase,
-  Image as ImageIcon,
-  Clock,
   ArrowLeft,
   ShieldCheck,
-  Globe,
-  Check,
 } from 'lucide-react';
 import type { Person } from '@/types';
 import { mockPeople } from '@/data/mock/people';
@@ -55,7 +49,7 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-sans)' }}>
+    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-body)' }}>
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -85,6 +79,7 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
             alt={`${person.fullName} cover`}
             fill
             className="object-cover opacity-60"
+            sizes="100vw"
             priority
           />
         ) : (
@@ -122,6 +117,7 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
                     alt={person.fullName}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 112px, 128px"
                     priority
                   />
                 ) : (
@@ -229,8 +225,8 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-150 ${
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-150 ${
                 activeTab === tab.id
                   ? 'bg-[#C7FF61] text-[#0B0D12] shadow-sm'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
@@ -477,6 +473,7 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
                         alt={img.alt}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 640px) 100vw, 50vw"
                       />
                     </div>
                     {img.caption && (
@@ -508,7 +505,13 @@ export default function PersonDetailClient({ person }: PersonDetailClientProps) 
                 >
                   <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0 bg-[var(--surface-active)]">
                     {rel.avatarUrl ? (
-                      <Image src={rel.avatarUrl} alt={rel.fullName} fill className="object-cover" />
+                      <Image
+                        src={rel.avatarUrl}
+                        alt={rel.fullName}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center font-bold text-sm text-[var(--accent-primary)]">
                         {rel.fullName.slice(0, 2)}

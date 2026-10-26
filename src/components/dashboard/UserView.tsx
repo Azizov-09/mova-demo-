@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -8,16 +8,12 @@ import {
   Bookmark,
   History,
   FolderOpen,
-  Sliders,
   User,
   CheckCircle2,
   ExternalLink,
   Trash2,
-  Search,
-  Sparkles,
   ArrowRight,
   TrendingUp,
-  Heart,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { mockPeople } from '@/data/mock/people';
@@ -26,32 +22,52 @@ interface UserViewProps {
   initialTab?: string;
 }
 
+const USER_TAB_ALIASES: Record<string, string> = {
+  categories: 'preferences',
+};
+
+const USER_TABS = new Set(['overview', 'saved', 'recent', 'preferences', 'account']);
+
+function resolveUserTab(tab: string) {
+  const resolved = USER_TAB_ALIASES[tab] ?? tab;
+  return USER_TABS.has(resolved) ? resolved : 'overview';
+}
+
+const DEFAULT_SAVED_PEOPLE = mockPeople.slice(0, 5);
+const RECENT_PEOPLE = mockPeople.slice(2, 6);
+const FEED_OPTIONS = [
+  { id: 'curated', label: 'Curated by MOVA Editorial' },
+  { id: 'trending', label: 'Trending & High-Activity' },
+  { id: 'recent', label: 'Recently Added Profiles' },
+] as const;
+
+function loadSavedPeople() {
+  if (typeof window === 'undefined') return DEFAULT_SAVED_PEOPLE;
+
+  try {
+    const stored = localStorage.getItem('mova_user_saved_people');
+    if (!stored) return DEFAULT_SAVED_PEOPLE;
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed) || !parsed.every((id) => typeof id === 'string')) {
+      return DEFAULT_SAVED_PEOPLE;
+    }
+    const matched = mockPeople.filter((person) => parsed.includes(person.id));
+    return matched.length > 0 ? matched : DEFAULT_SAVED_PEOPLE;
+  } catch {
+    return DEFAULT_SAVED_PEOPLE;
+  }
+}
+
 export function UserView({ initialTab = 'overview' }: UserViewProps) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => resolveUserTab(initialTab));
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Saved profiles state
-  const [savedPeople, setSavedPeople] = useState(() => mockPeople.slice(0, 5));
-  const [recentPeople, setRecentPeople] = useState(() => mockPeople.slice(2, 6));
+  const [savedPeople, setSavedPeople] = useState(loadSavedPeople);
+  const recentPeople = RECENT_PEOPLE;
 
   const [feedPreference, setFeedPreference] = useState<'trending' | 'curated' | 'recent'>('curated');
   const [emailDigest, setEmailDigest] = useState(true);
-
-  // Load from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('mova_user_saved_people');
-        if (stored) {
-          const ids: string[] = JSON.parse(stored);
-          const matched = mockPeople.filter((p) => ids.includes(p.id));
-          if (matched.length > 0) {
-            setSavedPeople(matched);
-          }
-        }
-      } catch {}
-    }
-  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -122,7 +138,7 @@ export function UserView({ initialTab = 'overview' }: UserViewProps) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div
             className="p-5 rounded-2xl"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -189,7 +205,7 @@ export function UserView({ initialTab = 'overview' }: UserViewProps) {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[var(--border-subtle)]">
+        <div className="dashboard-tabs">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'saved', label: `Saved Profiles (${savedPeople.length})` },
@@ -347,11 +363,7 @@ export function UserView({ initialTab = 'overview' }: UserViewProps) {
                   Feed Ranking Algorithm
                 </label>
                 <div className="space-y-2">
-                  {[
-                    { id: 'curated', label: 'Curated by MOVA Editorial' },
-                    { id: 'trending', label: 'Trending & High-Activity' },
-                    { id: 'recent', label: 'Recently Added Profiles' },
-                  ].map((opt) => (
+                  {FEED_OPTIONS.map((opt) => (
                     <label
                       key={opt.id}
                       className="flex items-center gap-2.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] cursor-pointer"
@@ -360,7 +372,7 @@ export function UserView({ initialTab = 'overview' }: UserViewProps) {
                         type="radio"
                         name="feed"
                         checked={feedPreference === opt.id}
-                        onChange={() => setFeedPreference(opt.id as any)}
+                        onChange={() => setFeedPreference(opt.id)}
                         className="accent-[#34D399]"
                       />
                       <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>

@@ -119,7 +119,8 @@ export class MockCategoriesRepository implements CategoriesRepository {
 // ============================================================
 
 export class MockClaimsRepository implements ClaimsRepository {
-  async submit(_request: ClaimRequest): Promise<ClaimSubmissionResult> {
+  async submit(request: ClaimRequest): Promise<ClaimSubmissionResult> {
+    void request;
     // Simulate async processing delay
     await new Promise(resolve => setTimeout(resolve, 1200));
 

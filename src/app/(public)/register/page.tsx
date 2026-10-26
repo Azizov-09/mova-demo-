@@ -239,11 +239,17 @@ export default function RegisterPage() {
                 />
                 <span className="text-caption text-[var(--text-secondary)]">
                   I agree to the{' '}
-                  <Link href="/terms" className="text-[var(--accent-primary)] hover:underline">
+                  <Link
+                    href="/terms"
+                    className="inline-block whitespace-nowrap text-[var(--accent-primary)] hover:underline"
+                  >
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" className="text-[var(--accent-primary)] hover:underline">
+                  <Link
+                    href="/privacy"
+                    className="inline-block whitespace-nowrap text-[var(--accent-primary)] hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                   .

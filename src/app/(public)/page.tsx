@@ -4,13 +4,12 @@ import { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import {
   Search,
   ArrowRight,
   CheckCircle,
   Compass,
-  MapPin,
   Sparkles,
   TrendingUp,
   Users,
@@ -23,6 +22,79 @@ import { cn } from '@/lib/utils';
 // ============================================================
 // HERO SECTION
 // ============================================================
+
+type FloatingPortraitProps = {
+  person: (typeof mockPeople)[number];
+  index: number;
+  position: {
+    top: string;
+    left?: string;
+    right?: string;
+    width: string;
+    delay: number;
+  };
+  visible: boolean;
+};
+
+function FloatingPortrait({ person, index, position, visible }: FloatingPortraitProps) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const initials = person.fullName
+    .split(' ')
+    .map((name) => name[0])
+    .join('')
+    .slice(0, 2);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40, scale: 0.9 }}
+      animate={visible ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{
+        duration: 0.8,
+        delay: position.delay,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+      className="absolute overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-[var(--mova-shadow-lg)]"
+      style={{
+        top: position.top,
+        left: position.left,
+        right: position.right,
+        width: position.width,
+        aspectRatio: '3/4',
+        background: 'var(--bg-card)',
+      }}
+    >
+      {imageFailed ? (
+        <div className="flex h-full w-full items-center justify-center bg-[var(--bg-card)]">
+          <span
+            className="text-5xl font-black text-[var(--text-tertiary)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {initials}
+          </span>
+        </div>
+      ) : (
+        <Image
+          src={person.avatarUrl}
+          alt={person.fullName}
+          fill
+          className="object-cover"
+          sizes="20vw"
+          priority={index < 3}
+          onError={() => setImageFailed(true)}
+        />
+      )}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0B0D12]/90 to-transparent p-3">
+        <div className="mb-0.5 flex items-center gap-1">
+          <p className="truncate text-xs font-semibold text-white">{person.fullName}</p>
+          {person.verificationStatus === 'VERIFIED' && (
+            <CheckCircle size={10} style={{ color: '#22c55e', flexShrink: 0 }} />
+          )}
+        </div>
+        <p className="truncate text-[10px] text-white/60">{person.professionalTitle}</p>
+      </div>
+    </motion.div>
+  );
+}
 
 function HeroSection() {
   const router = useRouter();
@@ -52,7 +124,7 @@ function HeroSection() {
   const heroWords = ['Discover', 'People.'];
   const heroWords2 = ['Explore', 'Their', 'Stories.'];
 
-  const featuredPeople = mockPeople.slice(0, 5);
+  const featuredPeople = mockPeople.slice(0, 4);
 
   return (
     <section
@@ -82,61 +154,29 @@ function HeroSection() {
       {/* Floating Portrait Grid */}
       <motion.div
         style={{ y }}
-        className="absolute right-0 top-0 bottom-0 w-[40%] lg:w-[45%] hidden lg:block pointer-events-none overflow-hidden"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[42%] overflow-hidden xl:block"
         aria-hidden="true"
       >
         <div className="relative h-full w-full">
           {/* Portrait cards arranged in offset grid */}
           {featuredPeople.map((person, i) => {
             const positions = [
-              { top: '8%', left: '5%', w: '44%', delay: 0.5 },
-              { top: '5%', right: '0%', w: '42%', delay: 0.65 },
-              { top: '38%', left: '10%', w: '38%', delay: 0.8 },
-              { top: '35%', right: '5%', w: '40%', delay: 0.72 },
-              { top: '65%', left: '20%', w: '42%', delay: 0.9 },
+              { top: '9%', left: '4%', width: '43%', delay: 0.5 },
+              { top: '6%', right: '-4%', width: '40%', delay: 0.65 },
+              { top: '48%', left: '10%', width: '38%', delay: 0.8 },
+              { top: '43%', right: '5%', width: '39%', delay: 0.72 },
             ];
             const pos = positions[i];
             if (!pos) return null;
 
             return (
-              <motion.div
+              <FloatingPortrait
                 key={person.id}
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                animate={heroLoaded ? { opacity: 1, y: 0, scale: 1 } : {}}
-                transition={{
-                  duration: 0.8,
-                  delay: pos.delay,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                className="absolute rounded-2xl overflow-hidden border border-[var(--border-subtle)] shadow-[var(--shadow-lg)]"
-                style={{
-                  top: pos.top,
-                  left: (pos as { left?: string }).left,
-                  right: (pos as { right?: string }).right,
-                  width: pos.w,
-                  aspectRatio: '3/4',
-                  background: 'var(--bg-card)',
-                }}
-              >
-                <Image
-                  src={person.avatarUrl}
-                  alt={person.fullName}
-                  fill
-                  className="object-cover"
-                  sizes="20vw"
-                  priority={i < 2}
-                />
-                {/* Card info overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#0B0D12]/90 to-transparent">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <p className="text-xs font-semibold text-white truncate">{person.fullName}</p>
-                    {person.verificationStatus === 'VERIFIED' && (
-                      <CheckCircle size={10} style={{ color: '#22c55e', flexShrink: 0 }} />
-                    )}
-                  </div>
-                  <p className="text-[10px] text-white/60 truncate">{person.professionalTitle}</p>
-                </div>
-              </motion.div>
+                person={person}
+                index={i}
+                position={pos}
+                visible={heroLoaded}
+              />
             );
           })}
         </div>
@@ -144,7 +184,7 @@ function HeroSection() {
 
       {/* Content */}
       <div className="container-mova relative z-10 pt-20 pb-32">
-        <div className="max-w-2xl xl:max-w-3xl">
+        <div className="max-w-2xl xl:max-w-[54%] 2xl:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -169,7 +209,7 @@ function HeroSection() {
                 animate={heroLoaded ? { y: '0%' } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                {heroWords.map((word, i) => (
+                {heroWords.map((word) => (
                   <span
                     key={word}
                     className={cn(
@@ -214,7 +254,7 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.75 }}
           >
             <form onSubmit={handleSearch} role="search" aria-label="Search for people">
-              <div className="flex items-center gap-3 p-2 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--shadow-md)] max-w-xl">
+              <div className="flex items-center gap-3 p-2 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--mova-shadow-md)] max-w-xl">
                 <div className="flex items-center gap-3 flex-1 px-2">
                   <Search size={18} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
                   <input
@@ -438,7 +478,7 @@ function CategoryTile({
     >
       <Link
         href={`/explore?category=${category.id}`}
-        className="group relative flex flex-col rounded-2xl overflow-hidden border border-[var(--border-subtle)] aspect-square hover:border-[var(--border-default)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-md)]"
+        className="group relative flex flex-col rounded-2xl overflow-hidden border border-[var(--border-subtle)] aspect-square hover:border-[var(--border-default)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--mova-shadow-md)]"
         style={{ background: 'var(--bg-card)' }}
         aria-label={`Explore ${category.name}`}
       >
@@ -635,7 +675,7 @@ function StoriesSection() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute -bottom-6 -right-6 p-4 rounded-2xl border border-[var(--border-default)] shadow-[var(--shadow-lg)]"
+              className="absolute -bottom-6 -right-6 p-4 rounded-2xl border border-[var(--border-default)] shadow-[var(--mova-shadow-lg)]"
               style={{ background: 'var(--bg-card)', maxWidth: '200px' }}
             >
               <div className="flex items-start gap-3">

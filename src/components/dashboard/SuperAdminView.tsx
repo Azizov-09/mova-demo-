@@ -5,25 +5,15 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
-  Shield,
   UserCheck,
   AlertCircle,
   CheckCircle2,
   XCircle,
   Search,
-  Filter,
   Download,
   Plus,
   RefreshCw,
-  Clock,
-  MoreVertical,
-  Activity,
   Server,
-  Lock,
-  Globe,
-  Trash2,
-  Edit,
-  Eye,
   Check,
   ExternalLink,
   ChevronRight,
@@ -34,6 +24,27 @@ import { mockPeople } from '@/data/mock/people';
 
 interface SuperAdminViewProps {
   initialTab?: string;
+}
+
+const SUPER_ADMIN_TAB_ALIASES: Record<string, string> = {
+  categories: 'profiles',
+  moderation: 'claims',
+  reports: 'audit',
+};
+
+const SUPER_ADMIN_TABS = new Set([
+  'overview',
+  'users',
+  'claims',
+  'profiles',
+  'roles',
+  'settings',
+  'audit',
+]);
+
+function resolveSuperAdminTab(tab: string) {
+  const resolved = SUPER_ADMIN_TAB_ALIASES[tab] ?? tab;
+  return SUPER_ADMIN_TABS.has(resolved) ? resolved : 'overview';
 }
 
 // Mock initial data
@@ -76,7 +87,7 @@ const INITIAL_CLAIMS: ClaimRow[] = [
 ];
 
 export function SuperAdminView({ initialTab = 'overview' }: SuperAdminViewProps) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => resolveSuperAdminTab(initialTab));
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Users state
@@ -214,7 +225,7 @@ export function SuperAdminView({ initialTab = 'overview' }: SuperAdminViewProps)
         </div>
 
         {/* Global Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div
             className="p-5 rounded-2xl"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -281,7 +292,7 @@ export function SuperAdminView({ initialTab = 'overview' }: SuperAdminViewProps)
         </div>
 
         {/* Tab Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[var(--border-subtle)]">
+        <div className="dashboard-tabs">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'users', label: 'Users & Accounts' },
@@ -471,7 +482,13 @@ export function SuperAdminView({ initialTab = 'overview' }: SuperAdminViewProps)
               </button>
             </div>
 
-            <div className="overflow-x-auto">
+            <div
+              className="table-scroll"
+              tabIndex={0}
+              role="region"
+              aria-label="User accounts table; scroll horizontally for status and actions"
+              data-responsive-table
+            >
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-[var(--border-subtle)] text-[var(--text-tertiary)]">
@@ -714,7 +731,13 @@ export function SuperAdminView({ initialTab = 'overview' }: SuperAdminViewProps)
               </p>
             </div>
 
-            <div className="overflow-x-auto">
+            <div
+              className="table-scroll"
+              tabIndex={0}
+              role="region"
+              aria-label="Audit history table; scroll horizontally for full event details"
+              data-responsive-table
+            >
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-[var(--border-subtle)] text-[var(--text-tertiary)]">

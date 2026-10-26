@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -11,18 +11,13 @@ import {
   User,
   Compass,
   ArrowRight,
-  Sparkles,
-  CheckCircle,
 } from 'lucide-react';
 import { getDemoSession, startDemoSession } from '@/lib/demo/session';
 import { DEMO_ROLE_METADATA, ROLE_DASHBOARD_MAP, type DemoRole } from '@/lib/demo/types';
 
 export default function DashboardIndexPage() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
     const session = getDemoSession();
     if (session && session.user && session.user.role) {
       const targetRoute = ROLE_DASHBOARD_MAP[session.user.role];
@@ -48,7 +43,7 @@ export default function DashboardIndexPage() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-6"
-      style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-sans)' }}
+      style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-body)' }}
     >
       <div className="w-full max-w-4xl mx-auto text-center mb-10">
         <Link href="/" className="inline-flex items-center gap-2 mb-6 group">

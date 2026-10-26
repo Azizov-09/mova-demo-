@@ -103,7 +103,7 @@ export default function ExploreClient() {
     if (newSearch !== currentSearch) {
       router.replace(`/explore${newSearch ? `?${newSearch}` : ''}`, { scroll: false });
     }
-  }, [query, selectedCategories, verifiedOnly, sortBy]);
+  }, [query, selectedCategories, verifiedOnly, sortBy, router, searchParams]);
 
   const toggleCategory = (cat: PersonCategory) => {
     setSelectedCategories(prev =>

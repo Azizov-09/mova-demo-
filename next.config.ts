@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Keep browser-based visual evidence free of the development status badge.
+  // Compile and runtime errors are still reported by Next.js.
+  devIndicators: false,
   images: {
     remotePatterns: [
       {

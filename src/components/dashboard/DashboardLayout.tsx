@@ -200,10 +200,8 @@ export function DashboardLayout({
   const [session, setSession] = useState<DemoSession | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSwitch, setShowSwitch] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const s = getDemoSession();
     if (!s) {
       router.push('/login');
@@ -214,8 +212,35 @@ export function DashboardLayout({
       router.push(ROLE_DASHBOARD_MAP[s.user.role]);
       return;
     }
-    setSession(s);
+
+    // Session storage is an external browser system. Defer the state update so
+    // the effect synchronizes after hydration without causing a cascading render.
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setSession(s);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [requiredRole, router]);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [sidebarOpen]);
 
   const handleLogout = useCallback(() => {
     clearDemoSession();
@@ -232,7 +257,7 @@ export function DashboardLayout({
     [router]
   );
 
-  if (!mounted || !session) {
+  if (!session) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -285,10 +310,12 @@ export function DashboardLayout({
 
       <div
         className="min-h-screen flex"
-        style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-sans)' }}
+        style={{ background: 'var(--bg-base)', fontFamily: 'var(--font-body)' }}
       >
         {/* ═══ SIDEBAR ═══ */}
         <motion.aside
+          id="dashboard-sidebar"
+          aria-label={`${roleMeta.label} navigation`}
           className={cn(
             'fixed inset-y-0 left-0 z-50 flex flex-col w-64 lg:static lg:z-auto',
             'transition-transform duration-300 lg:translate-x-0',
@@ -441,6 +468,8 @@ export function DashboardLayout({
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden btn btn-ghost p-2"
                 aria-label="Open navigation"
+                  aria-controls="dashboard-sidebar"
+                  aria-expanded={sidebarOpen}
               >
                 <Menu size={18} />
               </button>
@@ -490,8 +519,10 @@ export function DashboardLayout({
           </header>
 
           {/* Page content */}
-          <main className="flex-1 overflow-auto p-4 lg:p-6" id="dashboard-main">
-            {children}
+          <main className="flex-1 min-w-0 overflow-auto px-4 py-5 sm:p-6 xl:p-8" id="dashboard-main">
+            <div className="mx-auto w-full" style={{ maxWidth: 'var(--dashboard-max)' }}>
+              {children}
+            </div>
           </main>
         </div>
       </div>

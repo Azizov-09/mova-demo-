@@ -1,4 +1,4 @@
-import type { Person, Category, PersonCategory } from '@/types';
+import type { Person, Category } from '@/types';
 
 // ============================================================
 // MOCK PEOPLE DATA — Fictional / Illustrative profiles only
@@ -270,8 +270,8 @@ export const mockPeople: Person[] = [
     biography:
       'James Chen is a Taiwanese-American professional basketball player currently playing for the Pacific Storm in the Asia-Pacific Basketball League. Known for his exceptional three-point shooting and court vision, James has represented the Taiwanese national team in three consecutive FIBA Asia Cup tournaments. He played college basketball at UCLA before going undrafted and earning a spot through open tryouts.',
     shortBio: 'Professional basketball player for Pacific Storm. Taiwanese-American. Three-time FIBA Asia Cup competitor.',
-    avatarUrl: 'https://images.unsplash.com/photo-1546961342-ea5f60b193cb?w=400&h=400&fit=crop&q=80',
-    coverImageUrl: 'https://images.unsplash.com/photo-1546519638399-1274d813a473?w=1200&h=600&fit=crop&q=80',
+    avatarUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=400&fit=crop&q=80',
+    coverImageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200&h=600&fit=crop&q=80',
     categories: ['athletes'],
     publicLocation: 'Taipei, Taiwan',
     verificationStatus: 'VERIFIED',
@@ -524,7 +524,7 @@ export const mockCategories: Category[] = [
     id: 'athletes',
     name: 'Athletes',
     description: 'Celebrate the achievements of elite athletes competing at the highest levels of sport.',
-    imageUrl: 'https://images.unsplash.com/photo-1546519638399-1274d813a473?w=800&h=500&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=500&fit=crop&q=80',
     profileCount: mockPeople.filter(p => p.categories.includes('athletes')).length,
     accentColor: '#FF6161',
   },

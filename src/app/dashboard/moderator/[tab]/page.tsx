@@ -7,7 +7,7 @@ async function ModeratorSubContent({
   params: Promise<{ tab: string }>;
 }) {
   const { tab } = await params;
-  return <ModeratorView initialTab={tab} />;
+  return <ModeratorView key={tab} initialTab={tab} />;
 }
 
 export default function ModeratorSubPage({

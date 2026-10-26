@@ -5,23 +5,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldAlert,
   CheckCircle2,
-  XCircle,
   AlertTriangle,
   Clock,
-  Eye,
   CheckSquare,
-  FileWarning,
-  History,
   Filter,
-  Search,
-  Check,
   UserX,
-  MessageSquare,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
 interface ModeratorViewProps {
   initialTab?: string;
+}
+
+const MODERATOR_TABS = new Set(['overview', 'pending', 'reported', 'content', 'history']);
+
+function resolveModeratorTab(tab: string) {
+  return MODERATOR_TABS.has(tab) ? tab : 'overview';
 }
 
 interface ModerationItem {
@@ -84,7 +83,7 @@ const INITIAL_MODERATION_QUEUE: ModerationItem[] = [
 ];
 
 export function ModeratorView({ initialTab = 'overview' }: ModeratorViewProps) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => resolveModeratorTab(initialTab));
   const [items, setItems] = useState<ModerationItem[]>(INITIAL_MODERATION_QUEUE);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [selectedReasonFilter, setSelectedReasonFilter] = useState('ALL');
@@ -157,7 +156,7 @@ export function ModeratorView({ initialTab = 'overview' }: ModeratorViewProps) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div
             className="p-5 rounded-2xl"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -224,7 +223,7 @@ export function ModeratorView({ initialTab = 'overview' }: ModeratorViewProps) {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[var(--border-subtle)]">
+        <div className="dashboard-tabs">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'pending', label: `Pending Queue (${pendingItems.length})` },

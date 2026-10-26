@@ -1,15 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  User,
   Star,
   Award,
-  FolderOpen,
-  Image as ImageIcon,
-  Globe,
   CheckCircle2,
   ExternalLink,
   Edit,
@@ -27,26 +23,112 @@ interface CreatorViewProps {
   initialTab?: string;
 }
 
+const CREATOR_TAB_ALIASES: Record<string, string> = {
+  profile: 'overview',
+  projects: 'social',
+  gallery: 'social',
+  settings: 'biography',
+};
+
+const CREATOR_TABS = new Set(['overview', 'biography', 'achievements', 'social', 'claim']);
+
+function resolveCreatorTab(tab: string) {
+  const resolved = CREATOR_TAB_ALIASES[tab] ?? tab;
+  return CREATOR_TABS.has(resolved) ? resolved : 'overview';
+}
+
+type CreatorBio = {
+  professionalTitle: string;
+  location: string;
+  shortBio: string;
+  fullBio: string;
+};
+
+type CreatorAchievement = {
+  id: string;
+  title: string;
+  year: string;
+  organization: string;
+};
+
+const DEFAULT_CREATOR_BIO: CreatorBio = {
+  professionalTitle: 'Jazz Pianist & Composer',
+  location: 'Tokyo, Japan / Paris, France',
+  shortBio:
+    'Contemporary jazz pianist blending traditional modal jazz with Japanese classical instrumentation and modern electronic textures.',
+  fullBio:
+    "Aiko Nakamura is one of East Asia's most acclaimed contemporary jazz pianists. Trained at the Tokyo University of the Arts and the Conservatoire de Paris, she has headlined major international jazz festivals including Montreux, Newport, and the Tokyo Jazz Festival.",
+};
+
+const DEFAULT_ACHIEVEMENTS: CreatorAchievement[] = [
+  { id: 'ach-1', title: 'Montreux Jazz Soloist Award', year: '2023', organization: 'Montreux Jazz Festival' },
+  { id: 'ach-2', title: 'Tokyo New Wave Improviser of the Year', year: '2021', organization: 'Japan Jazz Federation' },
+  { id: 'ach-3', title: 'Blue Note Tokyo 3-Day Sold-Out Residency', year: '2022', organization: 'Blue Note Records' },
+];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function loadCreatorBio(): CreatorBio {
+  if (typeof window === 'undefined') return DEFAULT_CREATOR_BIO;
+
+  try {
+    const stored = localStorage.getItem('mova_creator_bio_data');
+    if (!stored) return DEFAULT_CREATOR_BIO;
+    const parsed: unknown = JSON.parse(stored);
+    if (!isRecord(parsed)) return DEFAULT_CREATOR_BIO;
+
+    return {
+      professionalTitle:
+        typeof parsed.professionalTitle === 'string'
+          ? parsed.professionalTitle
+          : DEFAULT_CREATOR_BIO.professionalTitle,
+      location: typeof parsed.location === 'string' ? parsed.location : DEFAULT_CREATOR_BIO.location,
+      shortBio: typeof parsed.shortBio === 'string' ? parsed.shortBio : DEFAULT_CREATOR_BIO.shortBio,
+      fullBio: typeof parsed.fullBio === 'string' ? parsed.fullBio : DEFAULT_CREATOR_BIO.fullBio,
+    };
+  } catch {
+    return DEFAULT_CREATOR_BIO;
+  }
+}
+
+function loadCreatorAchievements(): CreatorAchievement[] {
+  if (typeof window === 'undefined') return DEFAULT_ACHIEVEMENTS;
+
+  try {
+    const stored = localStorage.getItem('mova_creator_achievements');
+    if (!stored) return DEFAULT_ACHIEVEMENTS;
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return DEFAULT_ACHIEVEMENTS;
+
+    const achievements = parsed.filter((entry): entry is CreatorAchievement =>
+      isRecord(entry) &&
+      typeof entry.id === 'string' &&
+      typeof entry.title === 'string' &&
+      typeof entry.year === 'string' &&
+      typeof entry.organization === 'string'
+    );
+
+    return achievements.length > 0 ? achievements : DEFAULT_ACHIEVEMENTS;
+  } catch {
+    return DEFAULT_ACHIEVEMENTS;
+  }
+}
+
 export function CreatorView({ initialTab = 'overview' }: CreatorViewProps) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState(() => resolveCreatorTab(initialTab));
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const initialBio = useMemo(() => loadCreatorBio(), []);
 
   // Editable bio state
-  const [professionalTitle, setProfessionalTitle] = useState('Jazz Pianist & Composer');
-  const [location, setLocation] = useState('Tokyo, Japan / Paris, France');
-  const [shortBio, setShortBio] = useState(
-    'Contemporary jazz pianist blending traditional modal jazz with Japanese classical instrumentation and modern electronic textures.'
-  );
-  const [fullBio, setFullBio] = useState(
-    'Aiko Nakamura is one of East Asia’s most acclaimed contemporary jazz pianists. Trained at the Tokyo University of the Arts and the Conservatoire de Paris, she has headlined major international jazz festivals including Montreux, Newport, and the Tokyo Jazz Festival.'
-  );
+  const [professionalTitle, setProfessionalTitle] = useState(initialBio.professionalTitle);
+  const [location, setLocation] = useState(initialBio.location);
+  const [shortBio, setShortBio] = useState(initialBio.shortBio);
+  const [fullBio, setFullBio] = useState(initialBio.fullBio);
 
   // Editable achievements
-  const [achievements, setAchievements] = useState([
-    { id: 'ach-1', title: 'Montreux Jazz Soloist Award', year: '2023', organization: 'Montreux Jazz Festival' },
-    { id: 'ach-2', title: 'Tokyo New Wave Improviser of the Year', year: '2021', organization: 'Japan Jazz Federation' },
-    { id: 'ach-3', title: 'Blue Note Tokyo 3-Day Sold-Out Residency', year: '2022', organization: 'Blue Note Records' },
-  ]);
+  const [achievements, setAchievements] = useState<CreatorAchievement[]>(loadCreatorAchievements);
 
   const [newAchTitle, setNewAchTitle] = useState('');
   const [newAchYear, setNewAchYear] = useState('2024');
@@ -55,26 +137,6 @@ export function CreatorView({ initialTab = 'overview' }: CreatorViewProps) {
   const [spotifyUrl, setSpotifyUrl] = useState('https://spotify.com/artist/aiko-nakamura');
   const [instagramUrl, setInstagramUrl] = useState('https://instagram.com/aiko.jazz');
   const [youtubeUrl, setYoutubeUrl] = useState('https://youtube.com/@aikonakamura');
-
-  // Load persisted creator data from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const storedBio = localStorage.getItem('mova_creator_bio_data');
-        if (storedBio) {
-          const parsed = JSON.parse(storedBio);
-          if (parsed.professionalTitle) setProfessionalTitle(parsed.professionalTitle);
-          if (parsed.location) setLocation(parsed.location);
-          if (parsed.shortBio) setShortBio(parsed.shortBio);
-          if (parsed.fullBio) setFullBio(parsed.fullBio);
-        }
-        const storedAch = localStorage.getItem('mova_creator_achievements');
-        if (storedAch) {
-          setAchievements(JSON.parse(storedAch));
-        }
-      } catch {}
-    }
-  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -183,7 +245,7 @@ export function CreatorView({ initialTab = 'overview' }: CreatorViewProps) {
         </div>
 
         {/* Analytics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div
             className="p-5 rounded-2xl"
             style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
@@ -250,7 +312,7 @@ export function CreatorView({ initialTab = 'overview' }: CreatorViewProps) {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-[var(--border-subtle)]">
+        <div className="dashboard-tabs">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'biography', label: 'Edit Biography & Title' },

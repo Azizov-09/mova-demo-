@@ -7,7 +7,7 @@ async function CreatorSubContent({
   params: Promise<{ tab: string }>;
 }) {
   const { tab } = await params;
-  return <CreatorView initialTab={tab} />;
+  return <CreatorView key={tab} initialTab={tab} />;
 }
 
 export default function CreatorSubPage({
