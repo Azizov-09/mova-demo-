@@ -219,7 +219,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Top bar */}
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6 2xl:max-w-[1600px]">
           <Link href="/" className="flex items-center gap-2 group" aria-label="MOVA Home">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg"
@@ -252,7 +252,7 @@ export default function LoginPage() {
 
         {/* Main content */}
         <div className="flex-1 px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10">
-          <div className="mx-auto w-full max-w-6xl">
+          <div className="mx-auto w-full max-w-6xl 2xl:max-w-[1480px]">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -343,7 +343,7 @@ export default function LoginPage() {
                   </div>
 
                   {/* Role cards grid */}
-                  <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6 xl:gap-5">
+                  <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6 xl:gap-5 2xl:max-w-[1480px]">
                     {DEMO_ROLE_METADATA.map((meta, i) => (
                       <div
                         key={meta.role}

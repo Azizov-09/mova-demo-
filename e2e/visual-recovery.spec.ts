@@ -64,6 +64,24 @@ const nestedDashboardRoutes = {
   user: ['saved', 'recent', 'categories', 'preferences', 'account'],
 } as const;
 
+const requiredResponsiveWidths = [
+  320,
+  360,
+  375,
+  390,
+  430,
+  640,
+  768,
+  1024,
+  1280,
+  1366,
+  1440,
+  1728,
+  1920,
+  2560,
+  3840,
+] as const;
+
 type LayoutAudit = {
   documentOverflow: number;
   clippedText: string[];
@@ -79,6 +97,9 @@ async function settlePage(page: Page, autoScroll = false) {
   await page.waitForTimeout(850);
 
   if (autoScroll) {
+    // A trusted scroll gesture closes the browser's LCP observation window before
+    // the synthetic full-page sweep loads below-the-fold images for screenshots.
+    await page.mouse.wheel(0, 1);
     await page.evaluate(async () => {
       const delay = (milliseconds: number) =>
         new Promise((resolve) => window.setTimeout(resolve, milliseconds));
@@ -369,4 +390,50 @@ test.describe('nested dashboard route audit', () => {
       });
     });
   }
+});
+
+test.describe('responsive foundation matrix', () => {
+  test('auth, public, and dashboard shells remain fluid from 320px to 3840px', async ({ page }) => {
+    test.setTimeout(240_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', (error) => runtimeErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') runtimeErrors.push(message.text());
+    });
+
+    const verifyRoute = async (route: string, label: string) => {
+      for (const width of requiredResponsiveWidths) {
+        const height = width >= 1920 ? 1200 : width >= 768 ? 900 : 844;
+        await page.setViewportSize({ width, height });
+        await page.goto(route);
+        await settlePage(page);
+        const audit = await auditLayout(page);
+        const viewportLabel = `${label}-${width}px`;
+
+        expect(audit.documentOverflow, `${viewportLabel}: document overflow`).toBe(0);
+        expect(audit.clippedText, `${viewportLabel}: clipped text`).toEqual([]);
+        expect(audit.overlappingControls, `${viewportLabel}: overlapping controls`).toEqual([]);
+        expect(audit.offscreenControls, `${viewportLabel}: controls outside viewport`).toEqual([]);
+
+        if (width === 320 || width === 3840) {
+          await page.screenshot({
+            path: path.join(visualRoot, `${label}-${width}px.png`),
+          });
+        }
+      }
+    };
+
+    await verifyRoute('/login', 'login');
+    await verifyRoute('/', 'home');
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Enter Super Admin Demo', exact: true }).click();
+    await page.waitForURL('**/dashboard/super-admin');
+    await verifyRoute('/dashboard/super-admin', 'super-admin');
+
+    expect(runtimeErrors, 'browser runtime errors across the viewport matrix').toEqual([]);
+  });
 });

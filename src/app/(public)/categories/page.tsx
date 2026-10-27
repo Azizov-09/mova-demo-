@@ -33,7 +33,7 @@ export default function CategoriesPage() {
       {/* Categories Grid */}
       <section className="container-mova">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockCategories.map((category) => {
+          {mockCategories.map((category, index) => {
             const peopleInCategory = mockPeople.filter(p => p.categories.includes(category.id));
             const count = peopleInCategory.length;
 
@@ -50,6 +50,7 @@ export default function CategoriesPage() {
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={index < 3}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-elevated)] via-[var(--bg-elevated)]/40 to-transparent" />
 

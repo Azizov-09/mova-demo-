@@ -254,8 +254,8 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.75 }}
           >
             <form onSubmit={handleSearch} role="search" aria-label="Search for people">
-              <div className="flex items-center gap-3 p-2 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--mova-shadow-md)] max-w-xl">
-                <div className="flex items-center gap-3 flex-1 px-2">
+              <div className="flex max-w-xl items-center gap-2 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-2 shadow-[var(--mova-shadow-md)] sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3 px-2">
                   <Search size={18} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
                   <input
                     type="search"
@@ -268,8 +268,8 @@ function HeroSection() {
                 </div>
                 <button
                   type="submit"
-                  className="btn btn-primary rounded-xl shrink-0"
-                  style={{ padding: '10px 20px' }}
+                  className="btn btn-primary h-11 w-11 shrink-0 rounded-xl p-0 sm:w-auto sm:px-5"
+                  aria-label="Explore people"
                 >
                   <span className="hidden sm:inline">Explore</span>
                   <ArrowRight size={16} />
